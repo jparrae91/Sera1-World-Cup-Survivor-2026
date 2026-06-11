@@ -50,6 +50,7 @@ def load_data():
         "eliminated_teams": [],
         "advanced_teams": [],
         "admin_password": "sera1admin",
+        "picks_locked": False,
     }
 
 def save_data(data):
@@ -188,7 +189,10 @@ with tab_play:
                     if isinstance(v, list): used_teams.update(v)
                     elif v: used_teams.add(v)
                 
-                if data["stage"] == "group":
+                # Check if picks are locked
+                if data.get("picks_locked") and not picks.get(data["stage"]):
+                    st.warning("🔒 Los picks estan bloqueados por el admin. Ya no se pueden hacer selecciones para esta ronda.")
+                elif data["stage"] == "group":
                     st.subheader("🏟️ Fase de Grupos")
                     st.write("Escoge **4 equipos**. Si alguno no avanza de fase de grupos, estas fuera.")
                     current_pick = picks.get("group", [])
@@ -266,6 +270,24 @@ with tab_admin:
         st.success("Acceso concedido")
         st.write(f"**Etapa actual:** {STAGE_NAMES[data['stage']]}")
         
+        # Lock/Unlock picks
+        st.markdown("### Bloquear Picks")
+        locked = data.get("picks_locked", False)
+        if locked:
+            st.error("🔒 Picks BLOQUEADOS — nadie puede hacer selecciones")
+            if st.button("🔓 Desbloquear Picks"):
+                data["picks_locked"] = False
+                save_data(data)
+                st.rerun()
+        else:
+            st.success("🔓 Picks ABIERTOS — jugadores pueden seleccionar")
+            if st.button("🔒 Bloquear Picks (no mas selecciones)"):
+                data["picks_locked"] = True
+                save_data(data)
+                st.rerun()
+        
+        st.markdown("---")
+        
         if data["stage"] == "group":
             st.markdown("### Finalizar Fase de Grupos")
             st.write("Marca los equipos que **NO avanzaron**:")
@@ -279,6 +301,7 @@ with tab_admin:
                         data["players"][name]["eliminated"] = True
                         data["players"][name]["elimination_reason"] = f"No avanzaron: {', '.join(failed)}"
                 data["stage"] = "r32"
+                data["picks_locked"] = False
                 save_data(data)
                 st.rerun()
         
@@ -295,6 +318,7 @@ with tab_admin:
                         data["players"][name]["eliminated"] = True
                         data["players"][name]["elimination_reason"] = f"{pick} perdio en {STAGE_NAMES[data['stage']]}"
                 data["stage"] = STAGES[STAGES.index(data["stage"]) + 1]
+                data["picks_locked"] = False
                 save_data(data)
                 st.rerun()
         
@@ -304,4 +328,3 @@ with tab_admin:
             st.rerun()
     elif pw:
         st.error("Contrasena incorrecta")
-
