@@ -38,6 +38,9 @@ STAGE_NAMES = {
 STAGE_EMOJI = {
     "group": "🏟️", "r32": "⚔️", "r16": "🔥", "qf": "💪", "sf": "🏆", "final": "👑", "complete": "🎉",
 }
+PICKS_PER_STAGE = {
+    "group": 4, "r32": 2, "r16": 1, "qf": 1, "sf": 1, "final": 1,
+}
 
 def load_data():
     if DATA_FILE.exists():
@@ -196,42 +199,61 @@ with tab_play:
                     st.subheader("🏟️ Fase de Grupos")
                     st.write("Escoge **4 equipos**. Si alguno no avanza de fase de grupos, estas fuera.")
                     current_pick = picks.get("group", [])
+                    available = [t for t in ALL_TEAMS if t not in used_teams or t in (current_pick if isinstance(current_pick, list) else [])]
                     
-                    if current_pick:
-                        st.success(f"✅ Tus picks: **{', '.join(current_pick)}**")
-                        st.caption("Tus picks estan bloqueados. Buena suerte!")
+                    if data.get("picks_locked") and current_pick:
+                        st.success(f"✅ Tus picks (bloqueados): **{', '.join(current_pick)}**")
                     else:
-                        available = [t for t in ALL_TEAMS if t not in used_teams]
-                        selected = st.multiselect("Selecciona exactamente 4 equipos:", available, max_selections=4)
+                        default = current_pick if current_pick else []
+                        selected = st.multiselect("Selecciona exactamente 4 equipos:", ALL_TEAMS, default=default, max_selections=4)
                         
                         if len(selected) == 4:
-                            st.warning(f"Vas a lockear: **{', '.join(selected)}**. No hay vuelta atras.")
-                            if st.button("🔒 Confirmar Picks", type="primary"):
-                                data["players"][player_name]["picks"]["group"] = selected
-                                save_data(data)
-                                st.rerun()
+                            if selected != current_pick:
+                                if st.button("� Guardar Picks", type="primary"):
+                                    data["players"][player_name]["picks"]["group"] = selected
+                                    save_data(data)
+                                    st.success(f"✅ Guardado: **{', '.join(selected)}**")
+                                    st.rerun()
+                            else:
+                                st.success(f"✅ Tus picks: **{', '.join(selected)}**")
+                                st.caption("Puedes cambiarlos hasta que el admin bloquee los picks.")
                         elif selected:
                             st.info(f"Faltan {4 - len(selected)} equipo(s)")
                 
                 elif data["stage"] in ["r32", "r16", "qf", "sf", "final"]:
+                    num_picks = PICKS_PER_STAGE[data["stage"]]
                     st.subheader(f"{STAGE_EMOJI[data['stage']]} {STAGE_NAMES[data['stage']]}")
-                    st.write("Escoge **1 equipo**. Si pierde, estas fuera.")
-                    current_pick = picks.get(data["stage"])
+                    st.write(f"Escoge **{num_picks} equipo(s)**. Si alguno pierde, estas fuera.")
+                    current_pick = picks.get(data["stage"], [])
+                    # Normalize to list
+                    if isinstance(current_pick, str):
+                        current_pick = [current_pick] if current_pick else []
                     
-                    if current_pick:
-                        st.success(f"✅ Tu pick: **{current_pick}**")
+                    # Available = advanced teams minus used (but allow current picks to show)
+                    used_minus_current = used_teams - set(current_pick)
+                    available = [t for t in data.get("advanced_teams", ALL_TEAMS) if t not in used_minus_current]
+                    
+                    if data.get("picks_locked") and current_pick:
+                        st.success(f"✅ Tu(s) pick(s) (bloqueados): **{', '.join(current_pick)}**")
                     else:
-                        available = [t for t in data.get("advanced_teams", ALL_TEAMS) if t not in used_teams]
-                        if available:
-                            selected = st.selectbox("Escoge tu equipo:", ["-- Escoge --"] + available)
-                            if selected != "-- Escoge --":
-                                st.warning(f"Vas a lockear: **{selected}**")
-                                if st.button("🔒 Confirmar Pick", type="primary"):
-                                    data["players"][player_name]["picks"][data["stage"]] = selected
-                                    save_data(data)
-                                    st.rerun()
+                        if num_picks == 1:
+                            default_idx = available.index(current_pick[0]) + 1 if current_pick and current_pick[0] in available else 0
+                            selected = st.selectbox("Escoge tu equipo:", ["-- Escoge --"] + available, index=default_idx)
+                            selected_list = [selected] if selected != "-- Escoge --" else []
                         else:
-                            st.error("No tienes equipos disponibles!")
+                            default = [t for t in current_pick if t in available]
+                            selected_list = st.multiselect(f"Selecciona {num_picks} equipos:", available, default=default, max_selections=num_picks)
+                        
+                        if len(selected_list) == num_picks:
+                            if selected_list != current_pick:
+                                if st.button("� Guardar Pick(s)", type="primary"):
+                                    data["players"][player_name]["picks"][data["stage"]] = selected_list if num_picks > 1 else selected_list[0]
+                                    save_data(data)
+                                    st.success(f"✅ Guardado: **{', '.join(selected_list)}**")
+                                    st.rerun()
+                            else:
+                                st.success(f"✅ Tu(s) pick(s): **{', '.join(selected_list)}**")
+                                st.caption("Puedes cambiarlos hasta que el admin bloquee los picks.")
 
 with tab_standings:
     st.subheader("📊 Tabla de Posiciones")
@@ -243,8 +265,10 @@ with tab_standings:
             dead.append({"Jugador": name, "Grupos": ", ".join(p.get("group", [])), 
                         "Razon": info.get("elimination_reason", "")})
         else:
+            r32_pick = p.get("r32", [])
+            if isinstance(r32_pick, list): r32_pick = ", ".join(r32_pick)
             alive.append({"Jugador": name, "Grupos": ", ".join(p.get("group", [])),
-                         "R32": p.get("r32", ""), "R16": p.get("r16", ""),
+                         "R32": r32_pick, "R16": p.get("r16", ""),
                          "QF": p.get("qf", ""), "SF": p.get("sf", ""), "Final": p.get("final", "")})
     
     if alive:
@@ -255,6 +279,52 @@ with tab_standings:
         st.dataframe(dead, use_container_width=True, hide_index=True)
 
 with tab_groups:
+    st.subheader("📜 Reglas del Juego")
+    st.markdown("""
+    ### Como funciona Actividad Sera1
+    
+    **Objetivo:** Sobrevivir todas las rondas del Mundial. Los que sobrevivan al final se dividen el pozo.
+    
+    ---
+    
+    **Fase de Grupos:**
+    - Cada jugador escoge **4 equipos**.
+    - Si **cualquiera** de esos 4 equipos no avanza a la siguiente ronda, el jugador queda **eliminado**.
+    
+    **Octavos de Final (R32):**
+    - Cada jugador sobreviviente escoge **2 equipos**.
+    - Si cualquiera de esos 2 pierde, el jugador queda eliminado.
+    
+    **Round of 16, Cuartos, Semifinales y Final:**
+    - Cada jugador sobreviviente escoge **1 equipo** por ronda.
+    - Si ese equipo pierde, el jugador queda eliminado.
+    
+    ---
+    
+    ### Reglas importantes
+    
+    1. **No se puede repetir equipo.** Una vez que usas un equipo en cualquier ronda, no lo puedes volver a usar en rondas futuras.
+    2. **Puedes cambiar tus picks** cuantas veces quieras HASTA que el admin (Parrita) bloquee las selecciones. Una vez bloqueadas, no hay cambios.
+    3. **Si sobreviven multiples jugadores** hasta el final, se dividen el pozo.
+    4. **Si todos mueren** en la misma ronda, el dinero se queda en la mesa (o se define entre los sobrevivientes de la ronda anterior).
+    
+    ---
+    
+    | Ronda | Equipos a escoger | Regla de eliminacion |
+    |-------|-------------------|---------------------|
+    | Fase de Grupos | 4 | Si alguno no avanza, estas fuera |
+    | Octavos (R32) | 2 | Si alguno pierde, estas fuera |
+    | R16 | 1 | Si pierde, estas fuera |
+    | Cuartos | 1 | Si pierde, estas fuera |
+    | Semifinales | 1 | Si pierde, estas fuera |
+    | Final | 1 | Si pierde, estas fuera |
+    
+    ---
+    
+    **Tip estrategico:** No quemes a tus mejores equipos en fase de grupos. Los vas a necesitar en las rondas eliminatorias donde solo puedes escoger 1.
+    """)
+    
+    st.markdown("---")
     st.subheader("🌍 Grupos del Mundial 2026")
     cols = st.columns(3)
     for i, (g, teams) in enumerate(GROUPS.items()):
@@ -314,7 +384,12 @@ with tab_admin:
                 for name, info in data["players"].items():
                     if info.get("eliminated"): continue
                     pick = info.get("picks", {}).get(data["stage"])
-                    if pick in lost:
+                    if isinstance(pick, list):
+                        failed = [t for t in pick if t in lost]
+                        if failed:
+                            data["players"][name]["eliminated"] = True
+                            data["players"][name]["elimination_reason"] = f"{', '.join(failed)} perdio en {STAGE_NAMES[data['stage']]}"
+                    elif pick and pick in lost:
                         data["players"][name]["eliminated"] = True
                         data["players"][name]["elimination_reason"] = f"{pick} perdio en {STAGE_NAMES[data['stage']]}"
                 data["stage"] = STAGES[STAGES.index(data["stage"]) + 1]
