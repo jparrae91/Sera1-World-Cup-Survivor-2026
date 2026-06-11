@@ -15,18 +15,18 @@ DATA_FILE = Path("game_data.json")
 PLAYERS = ["Parrita", "Sirio", "Morsa", "Chuky", "Temo", "Jevu", "Pats", "Caborka", "Chirris", "Joe", "Tommy", "Buks"]
 
 GROUPS = {
-    "A": ["Mexico", "Colombia", "Ecuador", "Senegal"],
-    "B": ["Portugal", "Iran", "Paraguay", "New Zealand"],
-    "C": ["France", "Australia", "Indonesia", "UAE"],
-    "D": ["Brazil", "Cameroon", "Albania", "Fiji"],
-    "E": ["Argentina", "Peru", "Egypt", "Bahrain"],
-    "F": ["Netherlands", "Canada", "Turkey", "Ivory Coast"],
-    "G": ["Spain", "Bolivia", "Qatar", "Honduras"],
-    "H": ["England", "Nigeria", "Chile", "Uzbekistan"],
-    "I": ["Germany", "Uruguay", "USA", "Trinidad and Tobago"],
-    "J": ["Italy", "South Korea", "Saudi Arabia", "Kenya"],
-    "K": ["Belgium", "Japan", "Scotland", "Panama"],
-    "L": ["Croatia", "Serbia", "Morocco", "Denmark"],
+    "A": ["Mexico", "South Korea", "Czechia", "South Africa"],
+    "B": ["Canada", "Switzerland", "Qatar", "Bosnia-Herzegovina"],
+    "C": ["Brazil", "Morocco", "Scotland", "Haiti"],
+    "D": ["USA", "Australia", "Paraguay", "Turkiye"],
+    "E": ["Germany", "Ecuador", "Ivory Coast", "Curacao"],
+    "F": ["Netherlands", "Japan", "Tunisia", "Sweden"],
+    "G": ["Belgium", "Iran", "Egypt", "New Zealand"],
+    "H": ["Spain", "Uruguay", "Saudi Arabia", "Cape Verde"],
+    "I": ["France", "Senegal", "Norway", "Iraq"],
+    "J": ["Argentina", "Algeria", "Austria", "Jordan"],
+    "K": ["Portugal", "Colombia", "Uzbekistan", "DR Congo"],
+    "L": ["England", "Croatia", "Ghana", "Panama"],
 }
 
 ALL_TEAMS = sorted([team for group in GROUPS.values() for team in group])
@@ -304,3 +304,4 @@ with tab_admin:
             st.rerun()
     elif pw:
         st.error("Contrasena incorrecta")
+
