@@ -44,9 +44,14 @@ PICKS_PER_STAGE = {
 
 def load_data():
     if DATA_FILE.exists():
-        return json.loads(DATA_FILE.read_text())
-    # Initialize with all 12 players
-    players = {name: {"picks": {}, "eliminated": False} for name in PLAYERS}
+        data = json.loads(DATA_FILE.read_text())
+        # Ensure hardcoded picks are always present
+        for name, picks in DEFAULT_PICKS.items():
+            if name in data["players"] and not data["players"][name].get("picks", {}).get("group"):
+                data["players"][name]["picks"]["group"] = picks
+        return data
+    # Initialize with all 12 players and their confirmed picks
+    players = {name: {"picks": {"group": DEFAULT_PICKS.get(name, [])}, "eliminated": False} for name in PLAYERS}
     return {
         "players": players,
         "stage": "group",
@@ -55,6 +60,22 @@ def load_data():
         "admin_password": "sera1admin",
         "picks_locked": False,
     }
+
+# Hardcoded group stage picks (confirmed from screenshot June 12)
+DEFAULT_PICKS = {
+    "Parrita": ["Belgium", "Canada", "Mexico", "Uruguay"],
+    "Sirio": ["Croatia", "Canada", "Japan", "South Korea"],
+    "Morsa": ["Mexico", "Morocco", "USA", "Uruguay"],
+    "Chuky": ["Mexico", "Canada", "USA", "Belgium"],
+    "Temo": ["Ecuador", "USA", "South Korea", "Colombia"],
+    "Jevu": [],
+    "Pats": ["USA", "Belgium", "Croatia", "England"],
+    "Caborka": ["Mexico", "Canada", "Argentina", "Ecuador"],
+    "Chirris": ["Mexico", "Colombia", "Canada", "Portugal"],
+    "Joe": ["Switzerland", "Uruguay", "Colombia", "Morocco"],
+    "Tommy": ["Switzerland", "USA", "Colombia", "Uruguay"],
+    "Buks": ["Mexico", "USA", "Netherlands", "Portugal"],
+}
 
 def save_data(data):
     DATA_FILE.write_text(json.dumps(data, indent=2))
