@@ -1,0 +1,131 @@
+{
+  "players": {
+    "Parrita": {
+      "picks": {
+        "group": ["Belgium", "Canada", "Mexico", "Uruguay"]
+      },
+      "eliminated": true,
+      "elimination_reason": "No avanzaron: Uruguay"
+    },
+    "Sirio": {
+      "picks": {
+        "group": ["Croatia", "Canada", "Japan", "South Korea"]
+      },
+      "eliminated": true,
+      "elimination_reason": "No avanzaron: South Korea"
+    },
+    "Morsa": {
+      "picks": {
+        "group": ["Mexico", "Morocco", "USA", "Uruguay"]
+      },
+      "eliminated": true,
+      "elimination_reason": "No avanzaron: Uruguay"
+    },
+    "Chuky": {
+      "picks": {
+        "group": ["Mexico", "Canada", "USA", "Belgium"]
+      },
+      "eliminated": false
+    },
+    "Temo": {
+      "picks": {
+        "group": ["Ecuador", "USA", "South Korea", "Colombia"]
+      },
+      "eliminated": true,
+      "elimination_reason": "No avanzaron: South Korea"
+    },
+    "Pats": {
+      "picks": {
+        "group": ["USA", "Belgium", "Croatia", "England"]
+      },
+      "eliminated": false
+    },
+    "Caborka": {
+      "picks": {
+        "group": ["Mexico", "Canada", "Argentina", "Ecuador"]
+      },
+      "eliminated": false
+    },
+    "Chirris": {
+      "picks": {
+        "group": ["Mexico", "Colombia", "Canada", "Portugal"]
+      },
+      "eliminated": false
+    },
+    "Joe": {
+      "picks": {
+        "group": ["Switzerland", "Uruguay", "Colombia", "Morocco"]
+      },
+      "eliminated": true,
+      "elimination_reason": "No avanzaron: Uruguay"
+    },
+    "Tommy": {
+      "picks": {
+        "group": ["Switzerland", "USA", "Colombia", "Uruguay"]
+      },
+      "eliminated": true,
+      "elimination_reason": "No avanzaron: Uruguay"
+    },
+    "Buks": {
+      "picks": {
+        "group": ["Mexico", "USA", "Netherlands", "Portugal"]
+      },
+      "eliminated": false
+    }
+  },
+  "stage": "r32",
+  "eliminated_teams": [
+    "Haiti",
+    "Turkiye",
+    "Tunisia",
+    "Curacao",
+    "Qatar",
+    "Czechia",
+    "Scotland",
+    "South Korea",
+    "Iran",
+    "New Zealand",
+    "Uruguay",
+    "Saudi Arabia",
+    "Iraq",
+    "Jordan",
+    "Uzbekistan",
+    "Panama"
+  ],
+  "advanced_teams": [
+    "Algeria",
+    "Argentina",
+    "Australia",
+    "Austria",
+    "Belgium",
+    "Bosnia-Herzegovina",
+    "Brazil",
+    "Canada",
+    "Cape Verde",
+    "Colombia",
+    "Croatia",
+    "DR Congo",
+    "Ecuador",
+    "Egypt",
+    "England",
+    "France",
+    "Germany",
+    "Ghana",
+    "Ivory Coast",
+    "Japan",
+    "Mexico",
+    "Morocco",
+    "Netherlands",
+    "Norway",
+    "Paraguay",
+    "Portugal",
+    "Senegal",
+    "South Africa",
+    "Spain",
+    "Sweden",
+    "Switzerland",
+    "USA"
+  ],
+  "admin_password": "sera1admin",
+  "picks_locked": false
+}
