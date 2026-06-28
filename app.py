@@ -12,7 +12,7 @@ st.set_page_config(page_title="Actividad Sera1", page_icon="🏆", layout="wide"
 
 DATA_FILE = Path("game_data.json")
 
-PLAYERS = ["Parrita", "Sirio", "Morsa", "Chuky", "Temo", "Jevu", "Pats", "Caborka", "Chirris", "Joe", "Tommy", "Buks"]
+PLAYERS = ["Parrita", "Sirio", "Morsa", "Chuky", "Temo", "Pats", "Caborka", "Chirris", "Joe", "Tommy", "Buks"]
 
 GROUPS = {
     "A": ["Mexico", "South Korea", "Czechia", "South Africa"],
@@ -68,7 +68,6 @@ DEFAULT_PICKS = {
     "Morsa": ["Mexico", "Morocco", "USA", "Uruguay"],
     "Chuky": ["Mexico", "Canada", "USA", "Belgium"],
     "Temo": ["Ecuador", "USA", "South Korea", "Colombia"],
-    "Jevu": [],
     "Pats": ["USA", "Belgium", "Croatia", "England"],
     "Caborka": ["Mexico", "Canada", "Argentina", "Ecuador"],
     "Chirris": ["Mexico", "Colombia", "Canada", "Portugal"],
